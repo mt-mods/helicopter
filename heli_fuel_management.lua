@@ -1,7 +1,14 @@
 --
 -- fuel
 --
-helicopter.fuel = {['biofuel:biofuel'] = 1,['biofuel:bottle_fuel'] = 1,['biofuel:phial_fuel'] = 0.25, ['biofuel:fuel_can'] = 10}
+helicopter.fuel = {
+	['biofuel:biofuel'] = { qty = 1 },
+	['biofuel:bottle_fuel'] = { qty = 1 },
+	['biofuel:phial_fuel'] = { qty = 0.25 },
+	['biofuel:fuel_can'] = { qty = 10 },
+	['techage:ta3_canister_gasoline'] = { qty = 1, container = 'techage:ta3_canister_empty' },
+	['techage:ta3_barrel_gasoline'] = { qty = 10, container = 'techage:ta3_barrel_empty' },
+}
 
 minetest.register_entity("nss_helicopter:pointer",{
 initial_properties = {
@@ -64,11 +71,15 @@ function helicopter.loadFuel(self, player_name)
     if fuel then
         stack = ItemStack(item_name .. " 1")
 
-        if self.energy < 10 then
+        if self.energy < 10 then -- should return empty containers
             local taken = inv:remove_item("main", stack)
-            self.energy = self.energy + fuel
+            self.energy = self.energy + fuel.qty
             if self.energy > 10 then self.energy = 10 end
 
+	    if fuel.container ~= nil then
+		    local returned = inv:add_item("main", ItemStack(fuel.container .." 1"))
+		    if not returned then minetest.log("warning", "[helicopter]: failed to return empty container on refuel: ".. fuel.container) end
+	    end
             helicopter.updateIndicator(self)
         end
 

@@ -49,6 +49,9 @@ minetest.register_craftitem("nss_helicopter:heli", {
 				creative.is_enabled_for(placer:get_player_name())) then
 			itemstack:take_item()
 		end
+		if not minetest.get_modpath('biofuel') and not minetest.get_modpath('techage') then
+			minetest.chat_send_player(placer:get_player_name(), '[Helicopter] Techage or biofuel mod is required for compatible fuel sources')
+		end
 		return itemstack
 	end,
 })
