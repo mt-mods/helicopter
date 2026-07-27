@@ -92,15 +92,18 @@ function matrix3.tensor_multiply(a, b)
 end
 
 function matrix3.transpose(m)
-	return {m[1], m[4], m[7],
-	        m[2], m[5], m[8],
-	        m[3], m[6], m[9]}
+	return {
+		m[1], m[4], m[7],
+		m[2], m[5], m[8],
+		m[3], m[6], m[9]
+	}
 end
 
 function matrix3.determinant(m)
-	return m[1] * (m[5] * m[9] - m[6] * m[8])
-	     + m[2] * (m[6] * m[7] - m[4] * m[9])
-	     + m[3] * (m[4] * m[8] - m[5] * m[7])
+	return
+	m[1] * (m[5] * m[9] - m[6] * m[8])
+	+ m[2] * (m[6] * m[7] - m[4] * m[9])
+	+ m[3] * (m[4] * m[8] - m[5] * m[7])
 end
 
 function matrix3.invert(a)
@@ -140,25 +143,31 @@ end
 function matrix3.rotation_around_x(angle)
 	local s = sin(angle)
 	local c = cos(angle)
-	return {1, 0,  0,
-	        0, c, -s,
-	        0, s,  c}
+	return {
+		1, 0, 0,
+		0, c, -s,
+		0, s, c
+	}
 end
 
 function matrix3.rotation_around_y(angle)
 	local s = sin(angle)
 	local c = cos(angle)
-	return { c, 0, s,
-	         0, 1, 0,
-	        -s, 0, c}
+	return {
+		c, 0, s,
+		0, 1, 0,
+		-s, 0, c
+	}
 end
 
 function matrix3.rotation_around_z(angle)
 	local s = sin(angle)
 	local c = cos(angle)
-	return {c, -s, 0,
-	        s,  c, 0,
-	        0,  0, 1}
+	return {
+		c, -s, 0,
+		s, c, 0,
+		0, 0, 1
+	}
 end
 
 function matrix3.rotation_around_vector(v, angle)
@@ -170,8 +179,8 @@ function matrix3.rotation_around_vector(v, angle)
 	local c = cos(angle)
 	local omc = 1 - c
 	return {
-		v.x * v.x * omc + c,       v.x * v.y * omc - v.z * s, v.x * v.z * omc + v.y * s,
-		v.y * v.x * omc + v.z * s, v.y * v.y * omc + c,       v.y * v.z * omc - v.x * s,
+		v.x * v.x * omc + c, v.x * v.y * omc - v.z * s, v.x * v.z * omc + v.y * s,
+		v.y * v.x * omc + v.z * s, v.y * v.y * omc + c, v.y * v.z * omc - v.x * s,
 		v.z * v.x * omc - v.y * s, v.z * v.y * omc + v.x * s, v.z * v.z * omc + c
 	}
 end
@@ -192,8 +201,8 @@ function matrix3.from_pitch_yaw_roll(v)
 	local sy, cy = sin(v.y), cos(v.y)
 	local sz, cz = sin(v.z), cos(v.z)
 	return {
-		-sy * sx * sz + cy * cz, cz * sy * sx + cy * sz,  -cx * sy,
-		-cx * sz,                cx * cz,                 sx,
-		cy * sx * sz + cz * sy,  -cy * cz * sx + sy * sz, cy * cx
+		-sy * sx * sz + cy * cz, cz * sy * sx + cy * sz, -cx * sy,
+		-cx * sz, cx * cz, sx,
+		cy * sx * sz + cz * sy, -cy * cz * sx + sy * sz, cy * cx
 	}
 end

@@ -70,8 +70,8 @@ function helicopter.attach(self, player)
     player_api.player_attached[name] = true
     player_api.set_animation(player, "sit")
     -- make the driver sit
-    minetest.after(0.2, function()
-        local player = minetest.get_player_by_name(name)
+    core.after(0.2, function()
+        local player = core.get_player_by_name(name)
         if player then
 	        --player_api.set_animation(player, "sit")
             player:set_animation({x =  81, y = 160},30, 0, true)
@@ -115,8 +115,8 @@ function helicopter.attach_pax(self, player)
     player_api.player_attached[name] = true
     player_api.set_animation(player, "sit")
     -- make the driver sit
-    minetest.after(0.2, function()
-        local player = minetest.get_player_by_name(name)
+    core.after(0.2, function()
+        local player = core.get_player_by_name(name)
         if player then
             player:set_animation({x =  81, y = 160},30, 0, true)
         end
@@ -142,7 +142,7 @@ end
 -- destroy the helicopter
 function helicopter.destroy(self, puncher)
     if self.sound_handle then
-        minetest.sound_stop(self.sound_handle)
+        core.sound_stop(self.sound_handle)
         self.sound_handle = nil
     end
 
@@ -165,25 +165,25 @@ function helicopter.destroy(self, puncher)
 
     pos.y=pos.y+2
     for i=1,8 do
-	    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:steel_ingot')
+	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:steel_ingot')
     end
 
     for i=1,7 do
-	    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:diamond')
+	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:diamond')
     end
 
     for i=1,7 do
-	    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:mese_crystal')
+	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:mese_crystal')
     end
 
-    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:steelblock')
-    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:copperblock')
-    minetest.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'nss_helicopter:blades')
+    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:steelblock')
+    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:copperblock')
+    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'nss_helicopter:blades')
 end
 
 local function turn_on(self)
     if self.sound_handle == nil then
-        self.sound_handle = minetest.sound_play({name = "nssh_motor"},
+        self.sound_handle = core.sound_play({name = "nssh_motor"},
                 {object = self.object,
                 gain = 2.0,
                 max_hear_distance = 32,
@@ -199,7 +199,7 @@ function helicopter.sound_and_animation_manager(self)
         --no pilot
         if (touching_ground or liquid_below) then
             if self.sound_handle ~= nil then
-                minetest.sound_stop(self.sound_handle)
+                core.sound_stop(self.sound_handle)
                 self.sound_handle = nil
             end
             self.object:set_animation_frame_speed(0)

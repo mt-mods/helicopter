@@ -6,8 +6,8 @@ helicopter = {}
 
 helicopter.S = nil
 
-if(minetest.get_translator ~= nil) then
-    helicopter.S = minetest.get_translator(minetest.get_current_modname())
+if(core.get_translator ~= nil) then
+    helicopter.S = core.get_translator(core.get_current_modname())
 
 else
     helicopter.S = function ( s ) return s end
@@ -41,14 +41,14 @@ helicopter.colors ={
     yellow='#ffe400',
 }
 
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "settings.lua")
---dofile(minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM .. "heli_hud.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_hud.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_utilities.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_entities.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_crafts.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_control.lua")
-dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_fuel_management.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "settings.lua")
+--dofile(core.get_modpath(core.get_current_modname()) .. DIR_DELIM .. "heli_hud.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_hud.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_utilities.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_entities.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_crafts.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_control.lua")
+dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "heli_fuel_management.lua")
 
 
 helicopter.helicopter_last_time_command = 0
@@ -57,17 +57,17 @@ helicopter.helicopter_last_time_command = 0
 -- helpers and co.
 --
 
-if not minetest.global_exists("matrix3") then
-	dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "matrix.lua")
+if not core.global_exists("matrix3") then
+	dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "matrix.lua")
 end
 
-helicopter.creative = minetest.global_exists("creative")
+helicopter.creative = core.global_exists("creative")
 
 function helicopter.check_is_under_water(obj)
 	local pos_up = obj:get_pos()
 	pos_up.y = pos_up.y + 0.1
-	local node_up = minetest.get_node(pos_up).name
-	local nodedef = minetest.registered_nodes[node_up]
+	local node_up = core.get_node(pos_up).name
+	local nodedef = core.registered_nodes[node_up]
 	local liquid_up = nodedef.liquidtype ~= "none"
 	return liquid_up
 end

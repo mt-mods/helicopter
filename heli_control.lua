@@ -15,15 +15,15 @@ function helicopter.vector_length_sq(v)
 	return v.x * v.x + v.y * v.y + v.z * v.z
 end
 
-if not minetest.global_exists("matrix3") then
-	dofile(minetest.get_modpath("nss_helicopter") .. DIR_DELIM .. "matrix.lua")
+if not core.global_exists("matrix3") then
+	dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "matrix.lua")
 end
 
 function helicopter.check_node_below(obj)
 	local pos_below = obj:get_pos()
 	pos_below.y = pos_below.y - 0.1
-	local node_below = minetest.get_node(pos_below).name
-	local nodedef = minetest.registered_nodes[node_below]
+	local node_below = core.get_node(pos_below).name
+	local nodedef = core.registered_nodes[node_below]
 	local touching_ground = not nodedef or -- unknown nodes are solid
 			nodedef.walkable or false
 	local liquid_below = not touching_ground and nodedef.liquidtype ~= "none"
@@ -31,13 +31,13 @@ function helicopter.check_node_below(obj)
 end
 
 function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel_before)
-    helicopter.last_time_command = helicopter.last_time_command + dtime
-    if helicopter.last_time_command > 1 then helicopter.last_time_command = 1 end
+	helicopter.last_time_command = helicopter.last_time_command + dtime
+	if helicopter.last_time_command > 1 then helicopter.last_time_command = 1 end
 
-    if self.driver_name == nil then
-        return
-    end
-    local driver = minetest.get_player_by_name(self.driver_name)
+	if self.driver_name == nil then
+		return
+	end
+	local driver = core.get_player_by_name(self.driver_name)
 
 	if not driver then
 		-- there is no driver (eg. because driver left)
@@ -47,27 +47,27 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 		return
 	end
 
-    local ctrl = driver:get_player_control()
+	local ctrl = driver:get_player_control()
 
-    if ctrl.aux1 and helicopter.last_time_command > 0.3 then
-        helicopter.last_time_command = 0
-        if self._by_mouse == true then
-            self._by_mouse = false
-        else
-            self._by_mouse = true
-        end
-    end
-    
+	if ctrl.aux1 and helicopter.last_time_command > 0.3 then
+		helicopter.last_time_command = 0
+		if self._by_mouse == true then
+			self._by_mouse = false
+		else
+			self._by_mouse = true
+		end
+	end
+
 	local rot = self.object:get_rotation()
-    local position = self.object:get_pos()
+	local position = self.object:get_pos()
 
-    local max_height = 1500
+	local max_height = 1500
 	local vert_vel_goal = 0
 	if not liquid_below then
 		if ctrl.jump then
-            local compensated_vert_speed = helicopter.wanted_vert_speed
-            local curr_percent_height = (100 - ((position.y * 100) / max_height))/100
-            compensated_vert_speed = compensated_vert_speed * curr_percent_height
+			local compensated_vert_speed = helicopter.wanted_vert_speed
+			local curr_percent_height = (100 - ((position.y * 100) / max_height))/100
+			compensated_vert_speed = compensated_vert_speed * curr_percent_height
 			vert_vel_goal = vert_vel_goal + compensated_vert_speed
 		end
 		if ctrl.sneak then
@@ -79,8 +79,8 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 
 	-- rotation
 	if not touching_ground then
-        local rotation = self.object:get_rotation()
-        local yaw = rotation.y
+		local rotation = self.object:get_rotation()
+		local yaw = rotation.y
 		local tilting_goal = vector.new()
 		if ctrl.up then
 			tilting_goal.z = tilting_goal.z + 4
@@ -88,23 +88,23 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 		if ctrl.down then
 			tilting_goal.z = tilting_goal.z - 4
 		end
-        if self._by_mouse == true then
-		    if ctrl.right then
-			    tilting_goal.x = tilting_goal.x + 4
-		    end
-		    if ctrl.left then
-			    tilting_goal.x = tilting_goal.x - 4
-		    end
-        else
-		    if ctrl.right then
-			    yaw = yaw - 0.02
-                tilting_goal.x = tilting_goal.x + 0.2
-		    end
-		    if ctrl.left then
-			    yaw = yaw + 0.02
-                tilting_goal.x = tilting_goal.x - 0.2
-		    end
-        end
+		if self._by_mouse == true then
+			if ctrl.right then
+				tilting_goal.x = tilting_goal.x + 4
+			end
+			if ctrl.left then
+				tilting_goal.x = tilting_goal.x - 4
+			end
+		else
+			if ctrl.right then
+				yaw = yaw - 0.02
+				tilting_goal.x = tilting_goal.x + 0.2
+			end
+			if ctrl.left then
+				yaw = yaw + 0.02
+				tilting_goal.x = tilting_goal.x - 0.2
+			end
+		end
 		tilting_goal = vector.multiply(vector.normalize(tilting_goal), helicopter.tilting_max)
 
 		-- tilting
@@ -129,12 +129,12 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 		)
 		rot = matrix3.to_pitch_yaw_roll(rot_mat)
 
-        if self._by_mouse == true then
-		    rot.y = driver:get_look_horizontal()
-        else
-            rot.y = yaw
-        end
-        
+		if self._by_mouse == true then
+			rot.y = driver:get_look_horizontal()
+		else
+			rot.y = yaw
+		end
+
 
 	else
 		rot.x = 0
@@ -149,35 +149,35 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 	local power = vert_vel_goal - vel_before.y + helicopter.gravity * dtime
 	power = math.min(math.max(power, helicopter.power_min * dtime), helicopter.power_max * dtime)
 
-    -- calculate energy consumption --
-    ----------------------------------
-    if self.energy > 0 and touching_ground == false then
+	-- calculate energy consumption --
+	----------------------------------
+	if self.energy > 0 and touching_ground == false then
 
-        local consumed_power = (power/1500)
-        self.energy = self.energy - consumed_power;
+		local consumed_power = (power/1500)
+		self.energy = self.energy - consumed_power;
 
-        local energy_indicator_angle = ((self.energy * 18) - 90) * -1
-        if self.pointer:get_luaentity() then
-            self.pointer:set_attach(self.object,'',{x=0,y=11.26,z=9.37},{x=0,y=0,z=energy_indicator_angle})
-        else
-            --in case it have lost the entity by some conflict
-            self.pointer=minetest.add_entity({x=0,y=11.26,z=9.37},"nss_helicopter:pointer")
-            self.pointer:set_attach(self.object,'',{x=0,y=11.26,z=9.37},{x=0,y=0,z=energy_indicator_angle})
-        end
-    end
-    if self.energy <= 0 then
-        power = 0.2
+		local energy_indicator_angle = ((self.energy * 18) - 90) * -1
+		if self.pointer:get_luaentity() then
+			self.pointer:set_attach(self.object,'',{x=0,y=11.26,z=9.37},{x=0,y=0,z=energy_indicator_angle})
+		else
+			--in case it have lost the entity by some conflict
+			self.pointer=core.add_entity({x=0,y=11.26,z=9.37},"nss_helicopter:pointer")
+			self.pointer:set_attach(self.object,'',{x=0,y=11.26,z=9.37},{x=0,y=0,z=energy_indicator_angle})
+		end
+	end
+	if self.energy <= 0 then
+		power = 0.2
 		if touching_ground or liquid_below then
-            --criar uma fucao pra isso pois ela repete na linha 268
+			--criar uma fucao pra isso pois ela repete na linha 268
 			-- sound and animation
-            if self.sound_handle then minetest.sound_stop(self.sound_handle) end
+			if self.sound_handle then core.sound_stop(self.sound_handle) end
 			self.object:set_animation_frame_speed(0)
 			-- gravity
 			self.object:set_acceleration(vector.multiply(helicopter.vector_up, -helicopter.gravity))
 		end
-    end
-    ----------------------------
-    -- end energy consumption --
+	end
+	----------------------------
+	-- end energy consumption --
 
 
 	local rotated_up = matrix3.multiply(matrix3.from_pitch_yaw_roll(rot), helicopter.vector_up)

@@ -4,17 +4,17 @@
 local S = helicopter.S
 
 -- blades
-minetest.register_craftitem("nss_helicopter:blades",{
+core.register_craftitem("nss_helicopter:blades",{
 	description = S("Helicopter Blades"),
 	inventory_image = "nssh_blades_inv.png",
 })
 -- cabin
-minetest.register_craftitem("nss_helicopter:cabin",{
+core.register_craftitem("nss_helicopter:cabin",{
 	description = S("Cabin for Helicopter"),
 	inventory_image = "nssh_cabin_inv.png",
 })
 -- heli
-minetest.register_craftitem("nss_helicopter:heli", {
+core.register_craftitem("nss_helicopter:heli", {
 	description = S("Helicopter"),
 	inventory_image = "nssh_heli_inv.png",
 
@@ -22,7 +22,7 @@ minetest.register_craftitem("nss_helicopter:heli", {
 		if pointed_thing.type ~= "node" then
 			return
 		end
-		if minetest.get_node(pointed_thing.above).name ~= "air" then
+		if core.get_node(pointed_thing.above).name ~= "air" then
 			return
 		end
 
@@ -31,7 +31,7 @@ minetest.register_craftitem("nss_helicopter:heli", {
 		if color == "" then color = nil end
 		local fuel = math.floor(imeta:get_float("fuel") * 100) / 100
 
-		local obj = minetest.add_entity(pointed_thing.above, "nss_helicopter:heli")
+		local obj = core.add_entity(pointed_thing.above, "nss_helicopter:heli")
 		local ent = obj:get_luaentity()
 		local owner = placer:get_player_name()
 		ent.owner = owner
@@ -57,16 +57,16 @@ minetest.register_craftitem("nss_helicopter:heli", {
 -- crafting
 --
 
-if minetest.get_modpath("default") then
-	minetest.register_craft({
+if core.get_modpath("default") then
+	core.register_craft({
 		output = "nss_helicopter:blades",
 		recipe = {
-			{"",                    "default:steel_ingot", ""},
-			{"default:steel_ingot", "default:diamond",         "default:steel_ingot"},
-			{"",                    "default:steel_ingot", ""},
+			{"", "default:steel_ingot", ""},
+			{"default:steel_ingot", "default:diamond", "default:steel_ingot"},
+			{"", "default:steel_ingot", ""},
 		}
 	})
-	minetest.register_craft({
+	core.register_craft({
 		output = "nss_helicopter:cabin",
 		recipe = {
 			{"default:copperblock", "default:diamondblock", ""},
@@ -74,10 +74,10 @@ if minetest.get_modpath("default") then
 			{"default:steelblock", "xpanes:bar_flat", "xpanes:bar_flat"},
 		}
 	})
-	minetest.register_craft({
+	core.register_craft({
 		output = "nss_helicopter:heli",
 		recipe = {
-			{"",                  "nss_helicopter:blades"},
+			{"", "nss_helicopter:blades"},
 			{"nss_helicopter:blades", "nss_helicopter:cabin"},
 		}
 	})

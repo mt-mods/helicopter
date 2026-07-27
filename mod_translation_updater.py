@@ -4,8 +4,7 @@
 # Script to generate Minetest translation template files and update
 # translation files.
 #
-# Copyright (C) 2019 Joachim Stolberg, 2020 FaceDeer, 2020 Louis Royer,
-#                    2023 Wuzzy.
+# Copyright (C) 2019 Joachim Stolberg, 2020 FaceDeer, 2020 Louis Royer, 2023 Wuzzy.
 # License: LGPLv2.1 or later (see LICENSE file for details)
 
 import os, fnmatch, re, shutil, errno
