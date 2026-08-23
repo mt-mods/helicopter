@@ -41,9 +41,7 @@ core.register_craftitem("nss_helicopter:heli", {
 			helicopter.paint(ent, color)
 		end
 
-		local properties = ent.object:get_properties()
-		properties.infotext = owner .. S(" nice helicopter")
-		ent.object:set_properties(properties)
+		helicopter.setText(ent)
 
 		if not (helicopter.creative and placer and
 				creative.is_enabled_for(placer:get_player_name())) then

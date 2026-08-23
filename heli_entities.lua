@@ -92,9 +92,7 @@ core.register_entity("nss_helicopter:heli", {
 			self.color = data.stored_color
 			self.driver_name = data.stored_driver_name
 			--core.debug("loaded: ", self.energy)
-			local properties = self.object:get_properties()
-			properties.infotext = data.stored_owner .. S(" nice helicopter")
-			self.object:set_properties(properties)
+			helicopter.setText(self)
 		end
 
 		helicopter.paint(self, self.color)
