@@ -11,14 +11,14 @@ function helicopter.paint(self, colstr)
     if colstr then
         self.color = colstr
         local l_textures = self.initial_properties.textures
-        for _, texture in ipairs(l_textures) do
-            local i,indx = texture:find('nss_helicopter_painting.png')
+        for i, texture in ipairs(l_textures) do
+            local _, indx = texture:find('nss_helicopter_painting.png')
             if indx then
-                l_textures[_] = "nss_helicopter_painting.png^[multiply:".. colstr
+                l_textures[i] = "nss_helicopter_painting.png^[multiply:".. colstr
             end
-            local i,indx = texture:find('nss_helicopter_colective.png')
+            _, indx = texture:find('nss_helicopter_colective.png')
             if indx then
-                l_textures[_] = "nss_helicopter_colective.png^[multiply:".. colstr
+                l_textures[i] = "nss_helicopter_colective.png^[multiply:".. colstr
             end
         end
 	    self.object:set_properties({textures=l_textures})
@@ -71,11 +71,11 @@ function helicopter.attach(self, player)
     player_api.set_animation(player, "sit")
     -- make the driver sit
     core.after(0.2, function()
-        local player = core.get_player_by_name(name)
-        if player then
+        local player2 = core.get_player_by_name(name)
+        if player2 then
 	        --player_api.set_animation(player, "sit")
-            player:set_animation({x =  81, y = 160},30, 0, true)
-            update_heli_hud(player)
+            player2:set_animation({x =  81, y = 160},30, 0, true)
+            helicopter.update_heli_hud(player2)
         end
     end)
     -- disable gravity
@@ -98,7 +98,7 @@ function helicopter.dettach(self, player)
     self.object:set_acceleration(vector.multiply(helicopter.vector_up, -helicopter.gravity))
 
     --remove hud
-    if player then remove_heli_hud(player) end
+    if player then helicopter.remove_heli_hud(player) end
 end
 
 -- attach passenger
@@ -116,9 +116,9 @@ function helicopter.attach_pax(self, player)
     player_api.set_animation(player, "sit")
     -- make the driver sit
     core.after(0.2, function()
-        local player = core.get_player_by_name(name)
-        if player then
-            player:set_animation({x =  81, y = 160},30, 0, true)
+        local player2 = core.get_player_by_name(name)
+        if player2 then
+            player2:set_animation({x =  81, y = 160},30, 0, true)
         end
     end)
 end
@@ -150,7 +150,7 @@ function helicopter.destroy(self, puncher)
         -- detach the driver first (puncher must be driver)
         puncher:set_detach()
         puncher:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player_api.player_attached[name] = nil
+        player_api.player_attached[self.driver_name] = nil
         -- player should stand again
         player_api.set_animation(puncher, "stand")
         self.driver_name = nil
@@ -164,15 +164,15 @@ function helicopter.destroy(self, puncher)
     self.object:remove()
 
     pos.y=pos.y+2
-    for i=1,8 do
+    for _ = 1, 8 do
 	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:steel_ingot')
     end
 
-    for i=1,7 do
+    for _ = 1, 7 do
 	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:diamond')
     end
 
-    for i=1,7 do
+    for _ = 1, 7 do
 	    core.add_item({x=pos.x+math.random()-0.5,y=pos.y,z=pos.z+math.random()-0.5},'default:mese_crystal')
     end
 

@@ -1,7 +1,12 @@
 --
 -- fuel
 --
-helicopter.fuel = {['biofuel:biofuel'] = 1,['biofuel:bottle_fuel'] = 1,['biofuel:phial_fuel'] = 0.25, ['biofuel:fuel_can'] = 10}
+helicopter.fuel = {
+	['biofuel:biofuel'] = 1,
+	['biofuel:bottle_fuel'] = 1,
+	['biofuel:phial_fuel'] = 0.25,
+	['biofuel:fuel_can'] = 10
+}
 
 core.register_entity("nss_helicopter:pointer",{
 initial_properties = {
@@ -54,18 +59,16 @@ function helicopter.loadFuel(self, player_name)
 	if not player then return end
 
 	local inv = player:get_inventory()
-
 	local itmstck=player:get_wielded_item()
 	local item_name = ""
 	if itmstck then item_name = itmstck:get_name() end
 
-	local stack = nil
+	local stack
 	local fuel = helicopter.contains(helicopter.fuel, item_name)
 	if fuel then
 		stack = ItemStack(item_name .. " 1")
-
 		if self.energy < 10 then
-			local taken = inv:remove_item("main", stack)
+			inv:remove_item("main", stack)
 			self.energy = self.energy + fuel
 			if self.energy > 10 then self.energy = 10 end
 

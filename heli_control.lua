@@ -16,7 +16,7 @@ function helicopter.vector_length_sq(v)
 end
 
 if not core.global_exists("matrix3") then
-	dofile(core.get_modpath("nss_helicopter") .. DIR_DELIM .. "matrix.lua")
+	dofile(core.get_modpath("nss_helicopter") .. "/matrix.lua")
 end
 
 function helicopter.check_node_below(obj)
@@ -108,9 +108,13 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 		tilting_goal = vector.multiply(vector.normalize(tilting_goal), helicopter.tilting_max)
 
 		-- tilting
-		if helicopter.vector_length_sq(vector.subtract(tilting_goal, self.tilting)) > (dtime * helicopter.tilting_speed)^2 then
-			self.tilting = vector.add(self.tilting,
-					vector.multiply(vector.direction(self.tilting, tilting_goal), dtime * helicopter.tilting_speed))
+		if helicopter.vector_length_sq(vector.subtract(tilting_goal, self.tilting))
+					> (dtime * helicopter.tilting_speed)^2 then
+			self.tilting = vector.add(
+				self.tilting,
+				vector.multiply(vector.direction(self.tilting, tilting_goal),
+				dtime * helicopter.tilting_speed)
+			)
 		else
 			self.tilting = tilting_goal
 		end

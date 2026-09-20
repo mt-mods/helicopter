@@ -52,10 +52,13 @@ core.register_entity("nss_helicopter:heli", {
 		visual = "mesh",
 		mesh = "nss_helicopter_heli.b3d",
 		backface_culling = false,
-		textures = {"nss_helicopter_interior_black.png", "nss_helicopter_metal.png", "nss_helicopter_strips.png",
-				"nss_helicopter_painting.png", "nss_helicopter_black.png", "nss_helicopter_aluminum.png", "nss_helicopter_glass.png",
-				"nss_helicopter_interior.png", "nss_helicopter_panel.png", "nss_helicopter_colective.png", "nss_helicopter_painting.png",
-				"nss_helicopter_rotors.png", "nss_helicopter_interior_black.png",},
+		textures = {
+			"nss_helicopter_interior_black.png", "nss_helicopter_metal.png", "nss_helicopter_strips.png",
+			"nss_helicopter_painting.png", "nss_helicopter_black.png", "nss_helicopter_aluminum.png",
+			"nss_helicopter_glass.png", "nss_helicopter_interior.png", "nss_helicopter_panel.png",
+			"nss_helicopter_colective.png", "nss_helicopter_painting.png", "nss_helicopter_rotors.png",
+			"nss_helicopter_interior_black.png",
+		},
 	},
 
 	driver_name = nil,
@@ -83,7 +86,7 @@ core.register_entity("nss_helicopter:heli", {
 		})
 	end,
 
-	on_activate = function(self, staticdata, dtime_s)
+	on_activate = function(self, staticdata, _)
 		if staticdata ~= "" and staticdata ~= nil then
 			local data = core.deserialize(staticdata) or {}
 			self.energy = data.stored_energy
@@ -179,8 +182,9 @@ core.register_entity("nss_helicopter:heli", {
 		if is_attached then
 			local impact = helicopter.get_hipotenuse_value(vel, self.last_vel)
 			if impact > 5 then
-				--self.damage = self.damage + impact --sum the impact value directly to damage meter
-				local curr_pos = self.object:get_pos()
+				-- self.damage = self.damage + impact
+				-- sum the impact value directly to damage meter
+				-- local curr_pos = self.object:get_pos()
 				core.sound_play("nssh_collision", {
 					to_player = self.driver_name,
 					--pos = curr_pos,
@@ -198,7 +202,7 @@ core.register_entity("nss_helicopter:heli", {
 			local player = core.get_player_by_name(self.driver_name)
 			if helicopter.helicopter_last_time_command > 0.3 then
 				helicopter.helicopter_last_time_command = 0
-				update_heli_hud(player)
+				helicopter.update_heli_hud(player)
 			end
 		else
 			-- for some error the player can be detached from the helicopter, so lets set him attached again
@@ -219,7 +223,7 @@ core.register_entity("nss_helicopter:heli", {
 
 					--why its here? cause if the sound is attached, player must so
 					local player_owner = core.get_player_by_name(self.owner)
-					if player_owner then remove_heli_hud(player_owner) end
+					if player_owner then helicopter.remove_heli_hud(player_owner) end
 				end
 			end
 		end
@@ -229,7 +233,7 @@ core.register_entity("nss_helicopter:heli", {
 		self.object:set_velocity(vel)
 	end,
 
-	on_punch = function(self, puncher, ttime, toolcaps, dir, damage)
+	on_punch = function(self, puncher, _, toolcaps)
 		if not puncher or not puncher:is_player() then
 			return
 		end
@@ -244,7 +248,7 @@ core.register_entity("nss_helicopter:heli", {
 			return
 		end
 
-		local touching_ground, liquid_below = helicopter.check_node_below(self.object)
+		local touching_ground = helicopter.check_node_below(self.object)
 
 		--XXXXXXXX
 		local is_attached = false

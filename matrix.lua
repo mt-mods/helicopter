@@ -79,18 +79,6 @@ function matrix3.multiply(m1, m2)
 	return m3
 end
 
-function matrix3.tensor_multiply(a, b)
-	local m1 = matrix3.new()
-	m1[1] = a.x
-	m1[4] = a.y
-	m1[7] = a.z
-	local m2 = matrix3.new()
-	m2[1] = a.x
-	m2[2] = a.y
-	m2[3] = a.z
-	return matrix3.multiply(m1, m2)
-end
-
 function matrix3.transpose(m)
 	return {
 		m[1], m[4], m[7],

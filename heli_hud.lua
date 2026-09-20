@@ -1,6 +1,6 @@
-local heli_hud_list = {}
+-- local heli_hud_list = {}
 
-function update_heli_hud(player)
+function helicopter.update_heli_hud(player) -- luacheck: ignore 212
 	--[[
 	local player_name = player:get_player_name()
 
@@ -67,7 +67,7 @@ function update_heli_hud(player)
 end
 
 
-function remove_heli_hud(player)
+function helicopter.remove_heli_hud(player) -- luacheck: ignore 212
 	--[[
 	local player_name = player:get_player_name()
 	local ids = heli_hud_list[player_name]
