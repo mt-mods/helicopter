@@ -161,7 +161,6 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 		self.pointer:set_attach(self.object,'',{x=0,y=11.26,z=9.37},{x=0,y=0,z=energy_indicator_angle})
 	end
 	if self.energy <= 0 then
-		power = 0.2
 		if touching_ground or liquid_below then
 			--criar uma fucao pra isso pois ela repete na linha 268
 			-- sound and animation
@@ -169,6 +168,9 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 			self.object:set_animation_frame_speed(0)
 			-- gravity
 			self.object:set_acceleration(vector.multiply(helicopter.vector_up, -helicopter.gravity))
+			return
+		else
+			power = helicopter.power_min * dtime
 		end
 	end
 	----------------------------
