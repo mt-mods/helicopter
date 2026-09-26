@@ -53,10 +53,18 @@ core.register_entity("nss_helicopter:heli", {
 		mesh = "nss_helicopter_heli.b3d",
 		backface_culling = false,
 		textures = {
-			"nss_helicopter_interior_black.png", "nss_helicopter_metal.png", "nss_helicopter_strips.png",
-			"nss_helicopter_painting.png", "nss_helicopter_black.png", "nss_helicopter_aluminum.png",
-			"nss_helicopter_glass.png", "nss_helicopter_interior.png", "nss_helicopter_panel.png",
-			"nss_helicopter_colective.png", "nss_helicopter_painting.png", "nss_helicopter_rotors.png",
+			"nss_helicopter_interior_black.png",
+			"nss_helicopter_metal.png",
+			"nss_helicopter_strips.png",
+			"nss_helicopter_painting.png",
+			"nss_helicopter_black.png",
+			"nss_helicopter_aluminum.png",
+			"nss_helicopter_glass.png",
+			"nss_helicopter_interior.png",
+			"nss_helicopter_panel.png",
+			"nss_helicopter_colective.png",
+			"nss_helicopter_painting.png",
+			"nss_helicopter_rotors.png",
 			"nss_helicopter_interior_black.png",
 		},
 	},
@@ -129,30 +137,30 @@ core.register_entity("nss_helicopter:heli", {
 
 		local vel = self.object:get_velocity()
 
-		touching_ground, liquid_below = helicopter.check_node_below(self.object)
+		touching_ground, liquid_below = helicopter.check_node_below(self)
 		vel = helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel) or vel
-		helicopter.sound_and_animation_manager(self)
+		helicopter.sound_and_animation_manager(self, touching_ground or liquid_below)
 
 		if vel.x == 0 and vel.y == 0 and vel.z == 0 then
 			return
 		end
 
 		-- quadratic and constant deceleration
-		local speedsq = helicopter.vector_length_sq(vel)
-		local fq, fc
-		if touching_ground then
-			fq, fc = helicopter.friction_land_quadratic, helicopter.friction_land_constant
-		elseif liquid_below then
-			fq, fc = helicopter.friction_water_quadratic, helicopter.friction_water_constant
-		else
-			fq, fc = helicopter.friction_air_quadratic, helicopter.friction_air_constant
+		local speed = vector.length(vel)
+		if speed > 0 then
+			local fq, fc
+			if touching_ground then
+				fq, fc = helicopter.friction_land_quadratic, helicopter.friction_land_constant
+			elseif liquid_below then
+				fq, fc = helicopter.friction_water_quadratic, helicopter.friction_water_constant
+			else
+				fq, fc = helicopter.friction_air_quadratic, helicopter.friction_air_constant
+			end
+
+			local deceleration = fq * speed ^ 2 + fc
+			local new_speed = math.max(0, speed - deceleration * dtime)
+			vel = vector.multiply(vector.normalize(vel), new_speed)
 		end
-		vel = vector.apply(vel, function(a)
-			local s = math.sign(a)
-			a = math.abs(a)
-			a = math.max(0, a - fq * dtime * speedsq - fc * dtime)
-			return a * s
-		end)
 
 		--[[
 			collision detection
@@ -215,7 +223,7 @@ core.register_entity("nss_helicopter:heli", {
 			if can_stop then
 				--detach player
 				if self.sound_handle ~= nil then
-					helicopter.sound_and_animation_manager(self)
+					helicopter.sound_and_animation_manager(self, touching_ground or liquid_below)
 
 					if self.driver_name then
 						--why its here? cause if the sound is attached, player must so
@@ -246,7 +254,7 @@ core.register_entity("nss_helicopter:heli", {
 			return
 		end
 
-		local touching_ground = helicopter.check_node_below(self.object)
+		local touching_ground = helicopter.check_node_below(self)
 
 		--XXXXXXXX
 		local is_attached = false
@@ -344,17 +352,19 @@ core.register_entity("nss_helicopter:heli", {
 			self.owner = name
 		end
 
-		if self.owner == name or core.check_player_privs(clicker, {protection_bypass=true}) then
-			if name == self.driver_name then
-				-- driver clicked the object => driver gets off the vehicle
-				helicopter.dettach(self, clicker)
-				if self._passenger then
-					local passenger = core.get_player_by_name(self._passenger)
-					if passenger then
-						helicopter.dettach_pax(self, passenger)
-					end
+		if name == self.driver_name then
+			-- driver clicked the object => driver gets off the vehicle
+			helicopter.dettach(self, clicker)
+			if self._passenger then
+				local passenger = core.get_player_by_name(self._passenger)
+				if passenger then
+					helicopter.dettach_pax(self, passenger)
 				end
-			elseif not self.driver_name then
+			end
+		elseif name == self._passenger then
+			helicopter.dettach_pax(self, clicker)
+		elseif not self.driver_name then
+			if self.owner == name or core.check_player_privs(clicker, {protection_bypass=true}) then
 				local is_under_water = helicopter.check_is_under_water(self.object)
 				if is_under_water then return end
 				-- temporary------
@@ -363,20 +373,8 @@ core.register_entity("nss_helicopter:heli", {
 
 				helicopter.attach(self, clicker)
 			end
-		else
-			--passenger section
-			--only can enter when the pilot is inside
-			if self.driver_name then
-				if self._passenger == nil then
-					helicopter.attach_pax(self, clicker)
-				else
-					helicopter.dettach_pax(self, clicker)
-				end
-			else
-				if self._passenger then
-					helicopter.dettach_pax(self, clicker)
-				end
-			end
+		elseif not self._passenger then
+			helicopter.attach_pax(self, clicker)
 		end
 	end,
 })

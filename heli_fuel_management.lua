@@ -5,7 +5,7 @@ helicopter.fuel = {
 	['biofuel:biofuel'] = 1,
 	['biofuel:bottle_fuel'] = 1,
 	['biofuel:phial_fuel'] = 0.25,
-	['biofuel:fuel_can'] = 10
+	['biofuel:fuel_can'] = 10,
 }
 
 core.register_entity("nss_helicopter:pointer",{
