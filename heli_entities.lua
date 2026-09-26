@@ -138,21 +138,21 @@ core.register_entity("nss_helicopter:heli", {
 		end
 
 		-- quadratic and constant deceleration
-		local speedsq = helicopter.vector_length_sq(vel)
-		local fq, fc
-		if touching_ground then
-			fq, fc = helicopter.friction_land_quadratic, helicopter.friction_land_constant
-		elseif liquid_below then
-			fq, fc = helicopter.friction_water_quadratic, helicopter.friction_water_constant
-		else
-			fq, fc = helicopter.friction_air_quadratic, helicopter.friction_air_constant
+		local speed = vector.length(vel)
+		if speed > 0 then
+			local fq, fc
+			if touching_ground then
+				fq, fc = helicopter.friction_land_quadratic, helicopter.friction_land_constant
+			elseif liquid_below then
+				fq, fc = helicopter.friction_water_quadratic, helicopter.friction_water_constant
+			else
+				fq, fc = helicopter.friction_air_quadratic, helicopter.friction_air_constant
+			end
+
+			local deceleration = fq * speed ^ 2 + fc
+			local new_speed = math.max(0, speed - deceleration * dtime)
+			vel = vector.multiply(vector.normalize(vel), new_speed)
 		end
-		vel = vector.apply(vel, function(a)
-			local s = math.sign(a)
-			a = math.abs(a)
-			a = math.max(0, a - fq * dtime * speedsq - fc * dtime)
-			return a * s
-		end)
 
 		--[[
 			collision detection
