@@ -60,14 +60,12 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 	local max_height = 1500
 	local vert_vel_goal = 0
 	if not liquid_below then
-		if ctrl.jump then
-			local compensated_vert_speed = helicopter.wanted_vert_speed
-			local curr_percent_height = (100 - ((position.y * 100) / max_height))/100
-			compensated_vert_speed = compensated_vert_speed * curr_percent_height
-			vert_vel_goal = vert_vel_goal + compensated_vert_speed
+		local cur_height_rel = math.max(math.min(position.y / max_height, 2.0), 0)
+		if ctrl.jump or cur_height_rel > 1 then
+			vert_vel_goal = vert_vel_goal + helicopter.wanted_vert_speed * (1 - cur_height_rel)
 		end
 		if ctrl.sneak then
-			vert_vel_goal = vert_vel_goal - helicopter.wanted_vert_speed
+			vert_vel_goal = vert_vel_goal - helicopter.wanted_vert_speed * (1 + cur_height_rel)
 		end
 	else
 		vert_vel_goal = helicopter.wanted_vert_speed
