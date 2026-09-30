@@ -30,6 +30,10 @@ function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel
 	helicopter.last_time_command = helicopter.last_time_command + dtime
 	if helicopter.last_time_command > 1 then helicopter.last_time_command = 1 end
 
+	if self._passenger and not core.get_player_by_name(self._passenger) then
+		self._passenger = nil
+	end
+
 	if self.driver_name == nil then
 		return
 	end

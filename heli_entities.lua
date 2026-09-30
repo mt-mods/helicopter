@@ -344,17 +344,19 @@ core.register_entity("nss_helicopter:heli", {
 			self.owner = name
 		end
 
-		if self.owner == name or core.check_player_privs(clicker, {protection_bypass=true}) then
-			if name == self.driver_name then
-				-- driver clicked the object => driver gets off the vehicle
-				helicopter.dettach(self, clicker)
-				if self._passenger then
-					local passenger = core.get_player_by_name(self._passenger)
-					if passenger then
-						helicopter.dettach_pax(self, passenger)
-					end
+		if name == self.driver_name then
+			-- driver clicked the object => driver gets off the vehicle
+			helicopter.dettach(self, clicker)
+			if self._passenger then
+				local passenger = core.get_player_by_name(self._passenger)
+				if passenger then
+					helicopter.dettach_pax(self, passenger)
 				end
-			elseif not self.driver_name then
+			end
+		elseif name == self._passenger then
+			helicopter.dettach_pax(self, clicker)
+		elseif not self.driver_name then
+			if self.owner == name or core.check_player_privs(clicker, {protection_bypass=true}) then
 				local is_under_water = helicopter.check_is_under_water(self.object)
 				if is_under_water then return end
 				-- temporary------
@@ -363,20 +365,8 @@ core.register_entity("nss_helicopter:heli", {
 
 				helicopter.attach(self, clicker)
 			end
-		else
-			--passenger section
-			--only can enter when the pilot is inside
-			if self.driver_name then
-				if self._passenger == nil then
-					helicopter.attach_pax(self, clicker)
-				else
-					helicopter.dettach_pax(self, clicker)
-				end
-			else
-				if self._passenger then
-					helicopter.dettach_pax(self, clicker)
-				end
-			end
+		elseif not self._passenger then
+			helicopter.attach_pax(self, clicker)
 		end
 	end,
 })
