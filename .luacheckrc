@@ -7,7 +7,7 @@ read_globals = {
 	-- Luanti
 	"core", "minetest",
 	"vector", "ItemStack",
-	math = {fields = {"random", "sign"}},
+	math = {fields = {"random", "sign", "round"}},
 	table = {fields = {"copy"}},
 
 	-- Dependencies

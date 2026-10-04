@@ -129,9 +129,9 @@ core.register_entity("nss_helicopter:heli", {
 
 		local vel = self.object:get_velocity()
 
-		touching_ground, liquid_below = helicopter.check_node_below(self.object)
+		touching_ground, liquid_below = helicopter.check_node_below(self)
 		vel = helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel) or vel
-		helicopter.sound_and_animation_manager(self)
+		helicopter.sound_and_animation_manager(self, touching_ground or liquid_below)
 
 		if vel.x == 0 and vel.y == 0 and vel.z == 0 then
 			return
@@ -215,7 +215,7 @@ core.register_entity("nss_helicopter:heli", {
 			if can_stop then
 				--detach player
 				if self.sound_handle ~= nil then
-					helicopter.sound_and_animation_manager(self)
+					helicopter.sound_and_animation_manager(self, touching_ground or liquid_below)
 
 					if self.driver_name then
 						--why its here? cause if the sound is attached, player must so
@@ -246,7 +246,7 @@ core.register_entity("nss_helicopter:heli", {
 			return
 		end
 
-		local touching_ground = helicopter.check_node_below(self.object)
+		local touching_ground = helicopter.check_node_below(self)
 
 		--XXXXXXXX
 		local is_attached = false

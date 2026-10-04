@@ -15,15 +15,30 @@ function helicopter.vector_length_sq(v)
 	return v.x * v.x + v.y * v.y + v.z * v.z
 end
 
-function helicopter.check_node_below(obj)
-	local pos_below = obj:get_pos()
-	pos_below.y = pos_below.y - 0.1
-	local node_below = core.get_node(pos_below).name
-	local nodedef = core.registered_nodes[node_below]
-	local touching_ground = not nodedef or -- unknown nodes are solid
-			nodedef.walkable or false
-	local liquid_below = not touching_ground and nodedef.liquidtype ~= "none"
-	return touching_ground, liquid_below
+function helicopter.check_node_below(self)
+	local pos_below = self.object:get_pos()
+	local cbox = self.initial_properties.collisionbox
+	local x_min = math.round(pos_below.x + cbox[1])
+	local z_min = math.round(pos_below.z + cbox[3])
+	local x_max = math.round(pos_below.x + cbox[4])
+	local z_max = math.round(pos_below.z + cbox[6])
+	local y = pos_below.y - 0.1
+
+	local liquid_below = false
+	for x = x_min,x_max do
+		for z = z_min,z_max do
+			local node_name = core.get_node(vector.new(x, y, z)).name
+			local nodedef = core.registered_nodes[node_name]
+			 -- unknown nodes are solid
+			local touching_ground = not nodedef or nodedef.walkable or false
+			if touching_ground then
+				return touching_ground, false
+			end
+			liquid_below = liquid_below or nodedef.liquidtype ~= "none"
+		end
+	end
+
+	return false, liquid_below
 end
 
 function helicopter.heli_control(self, dtime, touching_ground, liquid_below, vel_before)
