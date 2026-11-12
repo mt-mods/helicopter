@@ -36,23 +36,29 @@ function helicopter.setText(self)
     end
 end
 
---returns 0 for old, 1 for new
-function helicopter.detect_player_api(player)
-    local player_proterties = player:get_properties()
-    local mesh = "character.b3d"
-    if player_proterties.mesh == mesh then
-        local models = player_api.registered_models
-        local character = models[mesh]
-        if character then
-            if character.animations.sit.eye_height then
-                return 1
-            else
-                return 0
-            end
-        end
-    end
+local function get_player_model(player)
+    local properties = player:get_properties()
+    return player_api.registered_models[properties.mesh]
+end
 
-    return 0
+-- Compatibility heuristic: animation eye heights were added in January 2022. Before this change,
+-- the eye height was the same for all animations and matched that of the standing animation.
+-- Returns 0 for the old behavior and 1 for the new behavior. This does not identify the model's geometry.
+function helicopter.detect_player_api(player)
+    local model = get_player_model(player)
+    if model and model.animations.sit and model.animations.sit.eye_height then
+        return 1
+    else
+        return 0
+    end
+end
+
+local function refresh_sitting_animation(player)
+    local model = get_player_model(player)
+    local sit = model and model.animations.sit
+    if sit then
+        player:set_animation(sit, model.animation_speed or 30, 0, true)
+    end
 end
 
 -- attach player
@@ -72,9 +78,9 @@ function helicopter.attach(self, player)
     -- make the driver sit
     core.after(0.2, function()
         local player2 = core.get_player_by_name(name)
-        if player2 then
-            --player_api.set_animation(player, "sit")
-            player2:set_animation({x =  81, y = 160},30, 0, true)
+        if player2 and self.driver_name == name
+                and player2:get_attach() == self.pilot_seat_base then
+            refresh_sitting_animation(player2)
             helicopter.update_heli_hud(player2)
         end
     end)
@@ -114,11 +120,12 @@ function helicopter.attach_pax(self, player)
     end
     player_api.player_attached[name] = true
     player_api.set_animation(player, "sit")
-    -- make the driver sit
+    -- make the passenger sit
     core.after(0.2, function()
         local player2 = core.get_player_by_name(name)
-        if player2 then
-            player2:set_animation({x =  81, y = 160},30, 0, true)
+        if player2 and self._passenger == name
+                and player2:get_attach() == self.passenger_seat_base then
+            refresh_sitting_animation(player2)
         end
     end)
 end
